@@ -1,0 +1,35 @@
+services:
+  bot:
+    container_name: 'mhb-bot'
+    restart: unless-stopped
+    pull_policy: build
+    depends_on:
+      - database
+    networks:
+      - mhb-network
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_HOST: 'database'
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+  database:
+    container_name: 'mhb-db'
+    image: postgres:alpine
+    restart: unless-stopped
+    networks:
+      - mhb-network
+    env_file:
+      - ../.env
+    ports:
+      - '5432:5432'
+    volumes:
+      - mhb-postgres:/var/lib/postgresql/data
+
+volumes:
+  mhb-postgres:
+
+networks:
+  mhb-network:
+    driver: bridge
